@@ -101,4 +101,23 @@ n8n community node required.
 
 ---
 
+## HubSpot CRM variant
+
+`workflows/lead-router-hubspot.json` logs every classified lead straight into
+**HubSpot CRM** — so the sales team gets a real, searchable contact record, not just
+a notification. `Shape result` fans out to HubSpot **and** Telegram in parallel; the
+lead's urgency maps to `hs_lead_status` (`hot → NEW`, `warm → OPEN`, `cold → UNQUALIFIED`).
+
+```bash
+export HUBSPOT_TOKEN=pat-...          # HubSpot private-app / service-key token
+n8n import:workflow --input=workflows/lead-router-hubspot.json
+```
+
+The node calls HubSpot's CRM v3 API directly
+(`POST /crm/v3/objects/contacts`, Bearer auth) — no community node needed. The
+contact's `firstname`, `email`, `phone`, `hs_lead_status`, and a summary line are
+written on every run.
+
+---
+
 *Part of the [yagaMI-Reverse](https://github.com/yagaMI-Reverse) portfolio. The demo business and leads are fictional.*
