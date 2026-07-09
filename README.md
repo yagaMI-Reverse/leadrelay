@@ -78,4 +78,27 @@ same philosophy (local orchestration + local inference), different job.
 
 ---
 
+## Twilio SMS variant
+
+`workflows/lead-router-sms.json` is the same pipeline with an added **Twilio SMS**
+node, so the owner gets an instant text (not just Telegram) the moment a lead is
+classified. `Shape result` fans out to Telegram **and** Twilio in parallel; both use
+`continueOnFail` so a flaky channel never kills the run.
+
+```bash
+# extra env for the SMS node (Twilio free trial works — trial sends to verified numbers)
+export TWILIO_ACCOUNT_SID=AC...
+export TWILIO_AUTH_TOKEN=...
+export TWILIO_FROM=+1...      # your Twilio number
+export TWILIO_TO=+1...        # owner's mobile
+
+n8n import:workflow --input=workflows/lead-router-sms.json
+```
+
+The Twilio node calls the Messages API directly (`POST /2010-04-01/Accounts/{SID}/Messages.json`,
+HTTP Basic auth built from the env vars, form-encoded `From`/`To`/`Body`) — no extra
+n8n community node required.
+
+---
+
 *Part of the [yagaMI-Reverse](https://github.com/yagaMI-Reverse) portfolio. The demo business and leads are fictional.*
